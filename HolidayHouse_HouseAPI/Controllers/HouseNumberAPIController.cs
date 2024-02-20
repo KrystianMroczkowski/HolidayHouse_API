@@ -15,11 +15,11 @@ namespace HolidayHouse_HouseAPI.Controllers
     {
         private readonly APIResponse _response;
         private readonly IMapper _mapper;
-        private readonly IHouseNumberRepository _dbHouseNumbers;
+        private readonly IHouseNumberRepository _dbHouseNumber;
         private readonly IHouseRepository _dbHouse;
         public HouseNumberAPIController(IHouseNumberRepository db, IMapper mapper, IHouseRepository dbHouse)
         {
-            _dbHouseNumbers = db;
+            _dbHouseNumber = db;
             _dbHouse = dbHouse;
             _mapper = mapper;
             this._response = new();
@@ -31,7 +31,7 @@ namespace HolidayHouse_HouseAPI.Controllers
         {
             try
             {
-                IEnumerable<HouseNumber> houseNumbers = await _dbHouseNumbers.GetAllAsync();
+                IEnumerable<HouseNumber> houseNumbers = await _dbHouseNumber.GetAllAsync(includeProperties:"House");
                 _response.Result = _mapper.Map<List<HouseNumberDTO>>(houseNumbers);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
@@ -59,7 +59,7 @@ namespace HolidayHouse_HouseAPI.Controllers
                     _response.IsSuccess = false;
                     return NotFound(_response);
                 }
-                HouseNumber houseNumber = await _dbHouseNumbers.GetAsync(u => u.HouseNo == houseNo);
+                HouseNumber houseNumber = await _dbHouseNumber.GetAsync(u => u.HouseNo == houseNo);
 
                 if (houseNumber == null)
                 {
@@ -96,16 +96,22 @@ namespace HolidayHouse_HouseAPI.Controllers
                     return BadRequest(_response);
                 }
 
-                if (await _dbHouse.GetAsync(u => u.Id == createDTO.HouseID) == null)
+                if (await _dbHouseNumber.GetAsync(u => u.HouseNo == createDTO.HouseNo, tracked:false) != null)
                 {
-                    ModelState.AddModelError("CustomError", $"Villa with {createDTO.HouseID} id doesn't exit!");
+                    ModelState.AddModelError("ErrorMessages", $"Villa Number already Exists!");
+                    return BadRequest(ModelState);
+                }
+
+                if (await _dbHouse.GetAsync(u => u.Id == createDTO.HouseID, tracked:false) == null)
+                {
+                    ModelState.AddModelError("ErrorMessages", $"Villa with {createDTO.HouseID} id doesn't exit!");
                     return BadRequest(ModelState);
                 }
 
                 HouseNumber houseNumber = _mapper.Map<HouseNumber>(createDTO);
                 houseNumber.CreatedDate = DateTime.Now;
 
-                await _dbHouseNumbers.CreateAsync(houseNumber);
+                await _dbHouseNumber.CreateAsync(houseNumber);
                 _response.Result = _mapper.Map<HouseNumberDTO>(houseNumber);
                 _response.StatusCode = HttpStatusCode.Created;
 
@@ -134,7 +140,7 @@ namespace HolidayHouse_HouseAPI.Controllers
                     _response.StatusCode = HttpStatusCode.BadRequest;
                     return BadRequest(_response);
                 }
-                HouseNumber houseNumber = await _dbHouseNumbers.GetAsync(u => u.HouseNo == houseNo);
+                HouseNumber houseNumber = await _dbHouseNumber.GetAsync(u => u.HouseNo == houseNo);
                 if (houseNumber == null)
                 {
                     _response.IsSuccess = false;
@@ -142,7 +148,7 @@ namespace HolidayHouse_HouseAPI.Controllers
                     return NotFound(_response);
                 }
 
-                await _dbHouseNumbers.RemoveAsync(houseNumber);
+                await _dbHouseNumber.RemoveAsync(houseNumber);
                 _response.StatusCode = HttpStatusCode.NoContent;
                 return Ok(_response);
             }
@@ -157,12 +163,12 @@ namespace HolidayHouse_HouseAPI.Controllers
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [HttpPut("{houseNo:int}", Name = "UpdateHouseNumber")]
-        public async Task<ActionResult<APIResponse>> UpdateHouseNumber(int houseNo, [FromBody] HouseNumberUpdateDTO updateDTO)
+        [HttpPut(Name = "UpdateHouseNumber")]
+        public async Task<ActionResult<APIResponse>> UpdateHouseNumber([FromBody] HouseNumberUpdateDTO updateDTO)
         {
             try
             {
-                if (updateDTO == null || updateDTO.HouseNo != houseNo)
+                if (updateDTO == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
                     return BadRequest(_response);
@@ -170,13 +176,13 @@ namespace HolidayHouse_HouseAPI.Controllers
 
                 if (await _dbHouse.GetAsync(u => u.Id == updateDTO.HouseID) == null)
                 {
-                    ModelState.AddModelError("CustomError", $"Villa with {updateDTO.HouseID} id doesn't exit!");
+                    ModelState.AddModelError("ErrorMessages", $"Villa with {updateDTO.HouseID} id doesn't exit!");
                     return BadRequest(ModelState);
                 }
 
                 HouseNumber houseNumber = _mapper.Map<HouseNumber>(updateDTO); 
 
-                await _dbHouseNumbers.UpdateAsync(houseNumber);
+                await _dbHouseNumber.UpdateAsync(houseNumber);
 
                 _response.StatusCode = HttpStatusCode.NoContent;
                 return Ok(_response);

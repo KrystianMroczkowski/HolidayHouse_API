@@ -1,0 +1,50 @@
+﻿@model HolidayHouse_Web.Models.VM.HouseNumberCreateVM
+
+<form asp-action="CreateHouseNumber">
+	<br />
+	<div class="container border p-3">
+		<h1 class="text-primary">Create House Number</h1>
+		<hr />
+
+		<div class="row">
+			<div asp-validation-summary="All" class="text-danger"></div>
+
+			<div class="col-2">
+				<label asp-for="HouseNumber.HouseNo" class="control-label pt-2" style="font-size:20px;"></label>
+			</div>
+			<div class="col-10 pb-3">
+				<input asp-for="HouseNumber.HouseNo" class="form-control" />
+				<span asp-validation-for="HouseNumber.HouseNo" class="text-danger"></span>
+			</div>
+
+			<div class="col-2">
+				<label asp-for="HouseNumber.SpecialDetails" class="control-label pt-2" style="font-size:20px;"></label>
+			</div>
+			<div class="col-10 pb-3">
+				<textarea asp-for="HouseNumber.SpecialDetails" class="form-control"></textarea>
+				<span asp-validation-for="HouseNumber.SpecialDetails" class="text-danger"></span>
+			</div>
+
+			<div class="col-2">
+				<label asp-for="HouseNumber.House.Name" class="control-label pt-2" style="font-size:20px;"></label>
+			</div>
+			<div class="col-10 pb-3">
+				<select asp-for="HouseNumber.HouseID" class="form-select" asp-items="@Model.HouseList">
+					<option disabled selected>Select Holiday House</option>
+				</select>
+			</div>
+
+			<div class="col-5 offset-2">
+				<a asp-controller="HouseNumber" asp-action="IndexHouseNumber" class="btn-primary btn form-control">Back to List</a>
+			</div>
+			<div class="col-5">
+				<input type="submit" value="Create" class="btn btn-success form-control" />
+			</div>
+		</div>
+	</div>
+</form>
+
+@section Scripts
+{
+	<partial name="_ValidationScriptsPartial" />
+}

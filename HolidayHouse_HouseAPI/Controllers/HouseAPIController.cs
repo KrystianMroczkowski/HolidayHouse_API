@@ -55,6 +55,7 @@ namespace HolidayHouse_HouseAPI.Controllers
                 if (id == 0)
                 {
                     _response.StatusCode = HttpStatusCode.BadRequest;
+                    _response.IsSuccess = false;
                     return BadRequest(_response);
                 }
 
@@ -62,7 +63,8 @@ namespace HolidayHouse_HouseAPI.Controllers
                 if (house == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
-                    return NotFound(_response);
+					_response.IsSuccess = false;
+					return NotFound(_response);
                 }
 
                 _response.Result = _mapper.Map<HouseDTO>(house);
@@ -90,11 +92,12 @@ namespace HolidayHouse_HouseAPI.Controllers
                 if (createDTO == null)
                 {
                     _response.StatusCode = HttpStatusCode.BadRequest;
-                    return BadRequest(_response);
+					_response.IsSuccess = false;
+					return BadRequest(_response);
                 }
                 if (await _dbHouse.GetAsync(u => u.Name.ToLower() == createDTO.Name.ToLower()) != null)
                 {
-                    ModelState.AddModelError("CustomError", "House already Exists!");
+                    ModelState.AddModelError("ErrorMessages", "House already Exists!");
                     return BadRequest(ModelState);
                 }
 
@@ -125,13 +128,15 @@ namespace HolidayHouse_HouseAPI.Controllers
                 if (id == 0)
                 {
                     _response.StatusCode = HttpStatusCode.BadRequest;
-                    return BadRequest(_response);
+					_response.IsSuccess = false;
+					return BadRequest(_response);
                 }
                 var houseToDelete = await _dbHouse.GetAsync(u => u.Id == id);
                 if (houseToDelete == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
-                    return NotFound(_response);
+					_response.IsSuccess = false;
+					return NotFound(_response);
                 }
 
                 await _dbHouse.RemoveAsync(houseToDelete);
@@ -149,17 +154,18 @@ namespace HolidayHouse_HouseAPI.Controllers
             return _response;
         }
 
-        [HttpPut("{id:int}", Name = "UpdateHouse")]
+        [HttpPut(Name = "UpdateHouse")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<APIResponse>> UpdateHouse(int id, [FromBody]HouseUpdateDTO updateDTO)
+        public async Task<ActionResult<APIResponse>> UpdateHouse([FromBody]HouseUpdateDTO updateDTO)
         {
             try
             {
-                if (updateDTO == null || updateDTO.Id != id)
+                if (updateDTO == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
-                    return BadRequest(_response);
+					_response.IsSuccess = false;
+					return BadRequest(_response);
                 }
 
                 House model = _mapper.Map<House>(updateDTO);

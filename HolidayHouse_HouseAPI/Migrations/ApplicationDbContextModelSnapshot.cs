@@ -31,18 +31,15 @@ namespace HolidayHouse_HouseAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Amenity")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Details")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -70,7 +67,7 @@ namespace HolidayHouse_HouseAPI.Migrations
                         {
                             Id = 1,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 2, 18, 22, 53, 26, 762, DateTimeKind.Local).AddTicks(3019),
+                            CreatedDate = new DateTime(2024, 2, 19, 17, 29, 32, 677, DateTimeKind.Local).AddTicks(7491),
                             Details = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmasteryimages.blob.core.windows.net/bluevillaimages/villa3.jpg",
                             Name = "Royal House",
@@ -83,7 +80,7 @@ namespace HolidayHouse_HouseAPI.Migrations
                         {
                             Id = 2,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 2, 18, 22, 53, 26, 762, DateTimeKind.Local).AddTicks(3074),
+                            CreatedDate = new DateTime(2024, 2, 19, 17, 29, 32, 677, DateTimeKind.Local).AddTicks(7585),
                             Details = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmasteryimages.blob.core.windows.net/bluevillaimages/villa1.jpg",
                             Name = "Premium Pool House",
@@ -96,7 +93,7 @@ namespace HolidayHouse_HouseAPI.Migrations
                         {
                             Id = 3,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 2, 18, 22, 53, 26, 762, DateTimeKind.Local).AddTicks(3077),
+                            CreatedDate = new DateTime(2024, 2, 19, 17, 29, 32, 677, DateTimeKind.Local).AddTicks(7588),
                             Details = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmasteryimages.blob.core.windows.net/bluevillaimages/villa4.jpg",
                             Name = "Luxury Pool House",
@@ -109,7 +106,7 @@ namespace HolidayHouse_HouseAPI.Migrations
                         {
                             Id = 4,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 2, 18, 22, 53, 26, 762, DateTimeKind.Local).AddTicks(3079),
+                            CreatedDate = new DateTime(2024, 2, 19, 17, 29, 32, 677, DateTimeKind.Local).AddTicks(7591),
                             Details = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmasteryimages.blob.core.windows.net/bluevillaimages/villa5.jpg",
                             Name = "Diamond House",
@@ -122,7 +119,7 @@ namespace HolidayHouse_HouseAPI.Migrations
                         {
                             Id = 5,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 2, 18, 22, 53, 26, 762, DateTimeKind.Local).AddTicks(3082),
+                            CreatedDate = new DateTime(2024, 2, 19, 17, 29, 32, 677, DateTimeKind.Local).AddTicks(7595),
                             Details = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmasteryimages.blob.core.windows.net/bluevillaimages/villa2.jpg",
                             Name = "Diamond Pool House",
@@ -145,7 +142,6 @@ namespace HolidayHouse_HouseAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("SpecialDetails")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedDate")

@@ -9,5 +9,7 @@ namespace HolidayHouse_HouseAPI.Models.Dto
         public string SpecialDetails { get; set; }
         [Required]
         public int HouseID { get; set; }
+
+        public HouseDTO House { get; set; }
     }
 }

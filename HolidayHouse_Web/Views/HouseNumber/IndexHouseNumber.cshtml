@@ -1,0 +1,41 @@
+﻿@model IEnumerable<HolidayHouse_Web.Models.Dto.HouseNumberDTO>
+
+<br />
+<div class="container p-4 border">
+	<div class="row pb-2">
+		<div class="col">
+			<h1 class="text-primary">House List</h1>
+		</div>
+		<div class="col text-end pt-1">
+			<a asp-controller="HouseNumber" asp-action="CreateHouseNumber" class="btn btn-outline-primary"><i class="bi bi-plus-square-fill"></i> Create New House Number</a>
+		</div>
+	</div>
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>
+					House Name
+				</th>
+				<th>
+					House Number
+				</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var item in Model)
+			{
+				<tr>
+					<td>@item.House.Name</td>
+					<td>@item.HouseNo</td>
+					<td>
+						<a asp-controller="HouseNumber" asp-action="UpdateHouseNumber" asp-route-houseNo="@item.HouseNo" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
+						<a asp-controller="HouseNumber" asp-action="DeleteHouseNumber" asp-route-houseNo="@item.HouseNo" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+
+</div>

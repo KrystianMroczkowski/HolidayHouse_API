@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HolidayHouse_HouseAPI", "HolidayHouse_HouseAPI\HolidayHouse_HouseAPI.csproj", "{6614B390-8688-48A1-9FA3-DDE0A9989579}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HolidayHouse_HouseAPI", "HolidayHouse_HouseAPI\HolidayHouse_HouseAPI.csproj", "{6614B390-8688-48A1-9FA3-DDE0A9989579}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HolidayHouse_Web", "HolidayHouse_Web\HolidayHouse_Web.csproj", "{DCADED76-FAE5-4B55-981D-AA54847E292B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HolidayHouse_Utility", "HolidayHouse_Utility\HolidayHouse_Utility.csproj", "{6B83DEEA-4B95-46A4-A789-062F473C8544}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{6614B390-8688-48A1-9FA3-DDE0A9989579}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6614B390-8688-48A1-9FA3-DDE0A9989579}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6614B390-8688-48A1-9FA3-DDE0A9989579}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCADED76-FAE5-4B55-981D-AA54847E292B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCADED76-FAE5-4B55-981D-AA54847E292B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCADED76-FAE5-4B55-981D-AA54847E292B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCADED76-FAE5-4B55-981D-AA54847E292B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B83DEEA-4B95-46A4-A789-062F473C8544}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B83DEEA-4B95-46A4-A789-062F473C8544}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B83DEEA-4B95-46A4-A789-062F473C8544}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B83DEEA-4B95-46A4-A789-062F473C8544}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

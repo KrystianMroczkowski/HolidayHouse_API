@@ -15,6 +15,7 @@ namespace HolidayHouse_HouseAPI
             CreateMap<HouseNumber, HouseNumberDTO>().ReverseMap();
             CreateMap<HouseNumber, HouseNumberCreateDTO>().ReverseMap();
             CreateMap<HouseNumber, HouseNumberUpdateDTO>().ReverseMap();
+            CreateMap<ApplicationUser, UserDTO>().ReverseMap();   
         }
     }
 }

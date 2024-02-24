@@ -1,23 +1,24 @@
 ﻿using HolidayHouse_HouseAPI.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace HolidayHouse_HouseAPI.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) 
             : base(options)
         {
 
         }
-
-
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<House> Houses { get; set; }
         public DbSet<HouseNumber> HouseNumbers { get; set; }
         public DbSet<LocalUser> LocalUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<House>().HasData(
                new House
                {

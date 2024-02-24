@@ -32,7 +32,7 @@ namespace HolidayHouse_Web.Services
             {
                 ApiType = SD.ApiType.POST,
                 Data = obj,
-                Url = houseUrl + "api/UserAuth/register"
+                Url = houseUrl + "/api/UserAuth/register"
             });
         }
     }

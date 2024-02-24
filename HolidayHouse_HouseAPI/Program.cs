@@ -1,9 +1,11 @@
-
 using HolidayHouse_HouseAPI;
 using HolidayHouse_HouseAPI.Data;
+using HolidayHouse_HouseAPI.Models;
 using HolidayHouse_HouseAPI.Repository;
 using HolidayHouse_HouseAPI.Repository.IRepository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -20,13 +22,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection"));
 });
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>().
+    AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddResponseCaching();
 builder.Services.AddScoped<IHouseRepository, HouseRepository>();
 builder.Services.AddScoped<IHouseNumberRepository, HouseNumberRepository>();    
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
-builder.Services.AddControllers(option => {
-    //option.ReturnHttpNotAcceptable = true;
-}).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
 
 var key = builder.Configuration.GetValue<string>("ApiSettings:Secret");
 
@@ -48,6 +50,13 @@ builder.Services.AddAuthentication(x =>
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddControllers(option => {
+    option.CacheProfiles.Add("Default30", new CacheProfile()
+    {
+        Duration = 30
+    });
+}).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -88,6 +97,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseResponseCaching();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

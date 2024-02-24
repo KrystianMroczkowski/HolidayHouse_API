@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using System.Text.Json;
 
 namespace HolidayHouse_HouseAPI.Controllers
 {
@@ -26,15 +27,33 @@ namespace HolidayHouse_HouseAPI.Controllers
         }
 
         [HttpGet]
+        //[ResponseCache(CacheProfileName = "Default30")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult<APIResponse>> GetHouses()
+        public async Task<ActionResult<APIResponse>> GetHouses([FromQuery(Name ="filterOccupancy")]int? occupancy,
+            [FromQuery] string? search, int pageSize = 0, int pageNumber = 1)
         {
             try
             {
-                IEnumerable<House> houses = await _dbHouse.GetAllAsync();
-                _response.Result = _mapper.Map<List<HouseDTO>>(houses);
+                IEnumerable<House> houseList;
+
+                if (occupancy > 0)
+                {
+                    houseList = await _dbHouse.GetAllAsync(u => u.Occupancy == occupancy, pageSize:pageSize, pageNumber:pageNumber);
+                }
+                else
+                {
+                    houseList = await _dbHouse.GetAllAsync();
+                }
+                if (!string.IsNullOrEmpty(search))
+                {
+                    houseList = houseList.Where(u => u.Name.ToLower().Contains(search));
+                }
+                Pagination pagination = new() { PageNumber = pageNumber, PageSize = pageSize };
+
+                Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagination)); 
+                _response.Result = _mapper.Map<List<HouseDTO>>(houseList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
             }

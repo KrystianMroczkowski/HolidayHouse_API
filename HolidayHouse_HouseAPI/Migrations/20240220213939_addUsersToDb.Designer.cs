@@ -4,6 +4,7 @@ using HolidayHouse_HouseAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HolidayHouse_HouseAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240220213939_addUsersToDb")]
+    partial class addUsersToDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,7 +70,7 @@ namespace HolidayHouse_HouseAPI.Migrations
                         {
                             Id = 1,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 2, 21, 2, 36, 50, 333, DateTimeKind.Local).AddTicks(7593),
+                            CreatedDate = new DateTime(2024, 2, 20, 22, 39, 38, 766, DateTimeKind.Local).AddTicks(5998),
                             Details = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmastery.com/bluevillaimages/villa3.jpg",
                             Name = "Royal House",
@@ -80,7 +83,7 @@ namespace HolidayHouse_HouseAPI.Migrations
                         {
                             Id = 2,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 2, 21, 2, 36, 50, 333, DateTimeKind.Local).AddTicks(7643),
+                            CreatedDate = new DateTime(2024, 2, 20, 22, 39, 38, 766, DateTimeKind.Local).AddTicks(6054),
                             Details = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmastery.com/bluevillaimages/villa1.jpg",
                             Name = "Premium Pool House",
@@ -93,7 +96,7 @@ namespace HolidayHouse_HouseAPI.Migrations
                         {
                             Id = 3,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 2, 21, 2, 36, 50, 333, DateTimeKind.Local).AddTicks(7646),
+                            CreatedDate = new DateTime(2024, 2, 20, 22, 39, 38, 766, DateTimeKind.Local).AddTicks(6057),
                             Details = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmastery.com/bluevillaimages/villa4.jpg",
                             Name = "Luxury Pool House",
@@ -106,7 +109,7 @@ namespace HolidayHouse_HouseAPI.Migrations
                         {
                             Id = 4,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 2, 21, 2, 36, 50, 333, DateTimeKind.Local).AddTicks(7649),
+                            CreatedDate = new DateTime(2024, 2, 20, 22, 39, 38, 766, DateTimeKind.Local).AddTicks(6060),
                             Details = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmastery.com/bluevillaimages/villa5.jpg",
                             Name = "Diamond House",
@@ -119,7 +122,7 @@ namespace HolidayHouse_HouseAPI.Migrations
                         {
                             Id = 5,
                             Amenity = "",
-                            CreatedDate = new DateTime(2024, 2, 21, 2, 36, 50, 333, DateTimeKind.Local).AddTicks(7652),
+                            CreatedDate = new DateTime(2024, 2, 20, 22, 39, 38, 766, DateTimeKind.Local).AddTicks(6062),
                             Details = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
                             ImageUrl = "https://dotnetmastery.com/bluevillaimages/villa2.jpg",
                             Name = "Diamond Pool House",
@@ -156,11 +159,11 @@ namespace HolidayHouse_HouseAPI.Migrations
 
             modelBuilder.Entity("HolidayHouse_HouseAPI.Models.LocalUser", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -174,7 +177,7 @@ namespace HolidayHouse_HouseAPI.Migrations
                     b.Property<string>("UserName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("id");
 
                     b.ToTable("LocalUsers");
                 });

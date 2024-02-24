@@ -1,4 +1,5 @@
 using AutoMapper;
+using HolidayHouse_Utility;
 using HolidayHouse_Web.Models;
 using HolidayHouse_Web.Models.Dto;
 using HolidayHouse_Web.Services.IServices;
@@ -23,7 +24,7 @@ namespace HolidayHouse_Web.Controllers
         {
             List<HouseDTO> list = new();
 
-            var response = await _houseService.GetAllAsync<APIResponse>();
+            var response = await _houseService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess != false)
             {
                 list = JsonConvert.DeserializeObject<List<HouseDTO>>(Convert.ToString(response.Result));

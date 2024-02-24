@@ -15,50 +15,55 @@ namespace HolidayHouse_Web.Services
             houseUrl = configuration.GetValue<string>("ServiceUrls:HouseAPI");
         }
 
-        public Task<T> CreateAsync<T>(HouseCreateDTO dto)
+        public Task<T> CreateAsync<T>(HouseCreateDTO dto, string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.POST,
                 Data = dto,
-                Url = houseUrl + "/api/HouseAPI"
+                Url = houseUrl + "/api/HouseAPI",
+                Token = token,
             });
         }
 
-        public Task<T> DeleteAsync<T>(int id)
+        public Task<T> DeleteAsync<T>(int id, string token)
         {
             return SendAsync<T>(new APIRequest
             {
                 ApiType = SD.ApiType.DELETE,
-                Url = houseUrl + "/api/HouseAPI/" + id
+                Url = houseUrl + "/api/HouseAPI/" + id,
+                Token = token,
             });
         }
 
-        public Task<T> GetAllAsync<T>()
+        public Task<T> GetAllAsync<T>(string token)
         {
             return SendAsync<T>(new APIRequest
             {
                 ApiType = SD.ApiType.GET,
-                Url = houseUrl + "/api/HouseAPI"
+                Url = houseUrl + "/api/HouseAPI",
+                Token = token,
             });
         }
 
-        public Task<T> GetAsync<T>(int id)
+        public Task<T> GetAsync<T>(int id, string token)
         {
             return SendAsync<T>(new APIRequest
             {
                 ApiType = SD.ApiType.GET,
-                Url = houseUrl + "/api/HouseAPI/" + id
+                Url = houseUrl + "/api/HouseAPI/" + id,
+                Token = token,
             });
         }
 
-        public Task<T> UpdateAsync<T>(HouseUpdateDTO dto)
+        public Task<T> UpdateAsync<T>(HouseUpdateDTO dto, string token)
         {
             return SendAsync<T>(new APIRequest
             {
                 ApiType = SD.ApiType.PUT,
                 Data = dto,
-                Url = houseUrl + "/api/HouseAPI"
+                Url = houseUrl + "/api/HouseAPI",
+                Token = token,
             });
         }
     }

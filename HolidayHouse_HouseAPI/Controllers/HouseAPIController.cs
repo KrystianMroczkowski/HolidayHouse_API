@@ -3,6 +3,7 @@ using HolidayHouse_HouseAPI.Data;
 using HolidayHouse_HouseAPI.Models;
 using HolidayHouse_HouseAPI.Models.Dto;
 using HolidayHouse_HouseAPI.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,8 @@ namespace HolidayHouse_HouseAPI.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<APIResponse>> GetHouses()
         {
             try
@@ -47,6 +50,8 @@ namespace HolidayHouse_HouseAPI.Controllers
         [HttpGet("{id:int}", Name = "GetHouse")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> GetHouse(int id)
         {
@@ -82,6 +87,7 @@ namespace HolidayHouse_HouseAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -117,10 +123,14 @@ namespace HolidayHouse_HouseAPI.Controllers
             }
             return _response;
         }
+
+        [HttpDelete("{id:int}", Name = "DeleteHouse")]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [HttpDelete("{id:int}", Name = "DeleteHouse")]
         public async Task<ActionResult<APIResponse>> DeleteHouse(int id)
         {
             try
@@ -155,6 +165,7 @@ namespace HolidayHouse_HouseAPI.Controllers
         }
 
         [HttpPut(Name = "UpdateHouse")]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> UpdateHouse([FromBody]HouseUpdateDTO updateDTO)

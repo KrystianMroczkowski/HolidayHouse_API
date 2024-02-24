@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using HolidayHouse_Utility;
 using HolidayHouse_Web.Models;
 using HolidayHouse_Web.Models.Dto;
 using HolidayHouse_Web.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -22,7 +24,7 @@ namespace HolidayHouse_Web.Controllers
         {
             List<HouseDTO> list = new();
 
-            var response = await _houseService.GetAllAsync<APIResponse>();
+            var response = await _houseService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess != false) 
             {
                 list = JsonConvert.DeserializeObject<List<HouseDTO>>(Convert.ToString(response.Result));
@@ -31,6 +33,7 @@ namespace HolidayHouse_Web.Controllers
             return View(list);
         }
 
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> CreateHouse()
         {
             return View();
@@ -38,11 +41,12 @@ namespace HolidayHouse_Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-		public async Task<IActionResult> CreateHouse(HouseCreateDTO model)
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> CreateHouse(HouseCreateDTO model)
 		{
             if (ModelState.IsValid)
             {
-                var response = await _houseService.CreateAsync<APIResponse>(model);
+                var response = await _houseService.CreateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
                 if (response != null && response.IsSuccess)
                 {
 					TempData["success"] = "Villa created successfully";
@@ -52,10 +56,10 @@ namespace HolidayHouse_Web.Controllers
             TempData["error"] = "Error encountered";
             return View(model);
 		}
-
-		public async Task<IActionResult> UpdateHouse(int houseId)
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> UpdateHouse(int houseId)
 		{
-            var response = await _houseService.GetAsync<APIResponse>(houseId);
+            var response = await _houseService.GetAsync<APIResponse>(houseId, HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess != false)
             {
                 HouseDTO model = JsonConvert.DeserializeObject<HouseDTO>(Convert.ToString(response.Result));
@@ -66,11 +70,12 @@ namespace HolidayHouse_Web.Controllers
 
         [HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> UpdateHouse(HouseUpdateDTO model)
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> UpdateHouse(HouseUpdateDTO model)
 		{
 			if (ModelState.IsValid)
 			{
-				var response = await _houseService.UpdateAsync<APIResponse>(model);
+				var response = await _houseService.UpdateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
 				if (response != null && response.IsSuccess)
 				{
                     TempData["success"] = "Villa updated successfully";
@@ -80,10 +85,10 @@ namespace HolidayHouse_Web.Controllers
             TempData["error"] = "Error encountered";
             return View(model);
 		}
-
-		public async Task<IActionResult> DeleteHouse(int houseId)
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> DeleteHouse(int houseId)
 		{
-			var response = await _houseService.GetAsync<APIResponse>(houseId);
+			var response = await _houseService.GetAsync<APIResponse>(houseId, HttpContext.Session.GetString(SD.SessionToken));
 			if (response != null && response.IsSuccess != false)
 			{
 				HouseDTO model = JsonConvert.DeserializeObject<HouseDTO>(Convert.ToString(response.Result));
@@ -94,9 +99,10 @@ namespace HolidayHouse_Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> DeleteHouse(HouseDTO model)
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> DeleteHouse(HouseDTO model)
 		{
-			var response = await _houseService.DeleteAsync<APIResponse>(model.Id);
+			var response = await _houseService.DeleteAsync<APIResponse>(model.Id, HttpContext.Session.GetString(SD.SessionToken));
 			if (response != null && response.IsSuccess)
 			{
                 TempData["success"] = "Villa deleted successfully";

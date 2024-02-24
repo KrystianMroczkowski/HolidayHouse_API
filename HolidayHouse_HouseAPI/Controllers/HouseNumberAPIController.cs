@@ -3,6 +3,7 @@ using HolidayHouse_HouseAPI.Migrations;
 using HolidayHouse_HouseAPI.Models;
 using HolidayHouse_HouseAPI.Models.Dto;
 using HolidayHouse_HouseAPI.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -81,10 +82,11 @@ namespace HolidayHouse_HouseAPI.Controllers
             return _response;
         }
 
+        [HttpPost]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpPost]
         public async Task<ActionResult<APIResponse>> CreateHouseNumber([FromBody] HouseNumberCreateDTO createDTO)
         {
             try
@@ -126,10 +128,11 @@ namespace HolidayHouse_HouseAPI.Controllers
             return _response;
         }
 
+        [HttpDelete("{houseNo:int}", Name = "DeleteHouseNumber")]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [HttpDelete("{houseNo:int}", Name = "DeleteHouseNumber")]
         public async Task<ActionResult<APIResponse>> DeleteHouseNumber(int houseNo)
         {
             try
@@ -161,9 +164,10 @@ namespace HolidayHouse_HouseAPI.Controllers
             return _response;
         }
 
+        [HttpPut(Name = "UpdateHouseNumber")]
+        [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [HttpPut(Name = "UpdateHouseNumber")]
         public async Task<ActionResult<APIResponse>> UpdateHouseNumber([FromBody] HouseNumberUpdateDTO updateDTO)
         {
             try

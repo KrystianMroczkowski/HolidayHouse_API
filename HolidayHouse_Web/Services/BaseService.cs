@@ -1,5 +1,7 @@
-﻿using HolidayHouse_Utility;
+﻿using AutoMapper.Internal;
+using HolidayHouse_Utility;
 using HolidayHouse_Web.Models;
+using HolidayHouse_Web.Models.Dto;
 using HolidayHouse_Web.Services.IServices;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
@@ -11,48 +13,92 @@ namespace HolidayHouse_Web.Services
     {
         public APIResponse responseModel { get; set; }
         public IHttpClientFactory httpClient { get; set; }
+        private readonly ITokenProvider _tokenProvider;
 
-        public BaseService(IHttpClientFactory httpClient)
+        public BaseService(IHttpClientFactory httpClient, ITokenProvider tokenProvider)
         {
-            this.responseModel = new();
+            responseModel = new();
+            _tokenProvider = tokenProvider;
             this.httpClient = httpClient;
         }
 
-        public async Task<T> SendAsync<T>(APIRequest apiRequest)
+        public async Task<T> SendAsync<T>(APIRequest apiRequest, bool withBearer = true)
         {
             try
             {
                 var client = httpClient.CreateClient("HouseAPI");
-                HttpRequestMessage message = new HttpRequestMessage();
-                message.Headers.Add("Accept", "application/json");
-                message.RequestUri = new Uri(apiRequest.Url);
-                if (apiRequest.Data != null)
-                {
-                    message.Content = new StringContent(JsonConvert.SerializeObject(apiRequest.Data), Encoding.UTF8, "application/json");
-                }
-                switch(apiRequest.ApiType)
-                {
-                    case SD.ApiType.POST:
-                        message.Method = HttpMethod.Post;
-                        break;
-                    case SD.ApiType.PUT:
-                        message.Method = HttpMethod.Put;
-                        break;
-                    case SD.ApiType.DELETE:
-                        message.Method = HttpMethod.Delete;
-                        break;
-                    default:
-                        message.Method = HttpMethod.Get;
-                        break;
-                }
+
+				var messageFactory = () =>
+				{
+					HttpRequestMessage message = new();
+					if (apiRequest.ContentType == SD.ContentType.MultipartFormData)
+					{
+						message.Headers.Add("Accept", "*/*");
+					}
+					else
+					{
+						message.Headers.Add("Accept", "application/json");
+					}
+					message.RequestUri = new Uri(apiRequest.Url);
+
+					if (withBearer && _tokenProvider.GetToken() != null)
+					{
+						var token = _tokenProvider.GetToken();
+						client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+					}
+
+					if (apiRequest.ContentType == SD.ContentType.MultipartFormData)
+					{
+						var content = new MultipartFormDataContent();
+
+						foreach (var prop in apiRequest.Data.GetType().GetProperties())
+						{
+							var value = prop.GetValue(apiRequest.Data);
+							if (value is FormFile)
+							{
+								var file = (FormFile)value;
+								if (file != null)
+								{
+									content.Add(new StreamContent(file.OpenReadStream()), prop.Name, file.FileName);
+								}
+							}
+							else
+							{
+								content.Add(new StringContent(value == null ? "" : value.ToString()), prop.Name);
+							}
+						}
+						message.Content = content;
+					}
+					else
+					{
+						if (apiRequest.Data != null)
+						{
+							message.Content = new StringContent(JsonConvert.SerializeObject(apiRequest.Data), Encoding.UTF8, "application/json");
+						}
+					}
+
+					switch (apiRequest.ApiType)
+					{
+						case SD.ApiType.POST:
+							message.Method = HttpMethod.Post;
+							break;
+						case SD.ApiType.PUT:
+							message.Method = HttpMethod.Put;
+							break;
+						case SD.ApiType.DELETE:
+							message.Method = HttpMethod.Delete;
+							break;
+						default:
+							message.Method = HttpMethod.Get;
+							break;
+					}
+
+					return message;
+				};
 
                 HttpResponseMessage apiResponse = null;
-                if(!string.IsNullOrEmpty(apiRequest.Token))
-                {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiRequest.Token);
-                }
 
-                apiResponse = await client.SendAsync(message);
+                apiResponse = await SendWithRefreshTokenAsync(client, messageFactory, withBearer);
 				var apiContent = await apiResponse.Content.ReadAsStringAsync();
 
 				try
@@ -89,5 +135,37 @@ namespace HolidayHouse_Web.Services
                 return APIResponse;
             }
         }
+
+		private async Task<HttpResponseMessage> SendWithRefreshTokenAsync(HttpClient httpClient, 
+			Func<HttpRequestMessage> httpRequestMessageFactory, bool withBearer = true)
+		{
+			if (!withBearer)
+			{
+				return await httpClient.SendAsync(httpRequestMessageFactory());
+			}
+			else
+			{
+				TokenDTO tokenDTO = _tokenProvider.GetToken();
+				if (tokenDTO != null && !string.IsNullOrEmpty(tokenDTO.AccessToken))
+				{
+					httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenDTO.AccessToken);
+				} 
+				
+				try
+				{
+					var response = await httpClient.SendAsync(httpRequestMessageFactory());
+                    if (response.IsSuccessStatusCode)
+                    {
+						return response;    
+                    }
+					return response;
+                }
+				catch (Exception ex)
+				{
+					throw;
+				}
+			}
+			
+		}
     }
 }

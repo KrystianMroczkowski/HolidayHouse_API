@@ -10,17 +10,18 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 
 builder.Services.AddHttpClient<IHouseService, HouseService>();
-builder.Services.AddScoped<IHouseService, HouseService>();
-
 builder.Services.AddHttpClient<IHouseNumberService, HouseNumberService>();
-builder.Services.AddScoped<IHouseNumberService, HouseNumberService>();
-
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddHttpClient<IAuthService, AuthService>();
+
+builder.Services.AddScoped<IBaseService, BaseService>();
+builder.Services.AddScoped<IHouseService, HouseService>();
+builder.Services.AddScoped<ITokenProvider, TokenProvider>();    
+builder.Services.AddScoped<IHouseNumberService, HouseNumberService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
 {
     options.Cookie.HttpOnly = true;
@@ -50,9 +51,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();

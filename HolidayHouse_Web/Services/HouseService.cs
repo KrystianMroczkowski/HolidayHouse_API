@@ -5,65 +5,64 @@ using HolidayHouse_Web.Services.IServices;
 
 namespace HolidayHouse_Web.Services
 {
-    public class HouseService : BaseService, IHouseService
+    public class HouseService : IHouseService
     {
         private readonly IHttpClientFactory _clientFactory;
-        private string houseUrl;
-        public HouseService(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory)
+		private readonly IBaseService _baseService;
+		private string houseUrl;
+        public HouseService(IHttpClientFactory clientFactory, IConfiguration configuration, IBaseService baseService)
         {
             _clientFactory = clientFactory;
+            _baseService = baseService;
             houseUrl = configuration.GetValue<string>("ServiceUrls:HouseAPI");
         }
 
-        public Task<T> CreateAsync<T>(HouseCreateDTO dto, string token)
+        public async Task<T> CreateAsync<T>(HouseCreateDTO dto)
         {
-            return SendAsync<T>(new APIRequest()
+            return await _baseService.SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.POST,
                 Data = dto,
                 Url = houseUrl + "/api/HouseAPI",
-                Token = token,
+                ContentType = SD.ContentType.MultipartFormData
             });
         }
 
-        public Task<T> DeleteAsync<T>(int id, string token)
+        public async Task<T> DeleteAsync<T>(int id)
         {
-            return SendAsync<T>(new APIRequest
+            return await _baseService.SendAsync<T>(new APIRequest
             {
                 ApiType = SD.ApiType.DELETE,
                 Url = houseUrl + "/api/HouseAPI/" + id,
-                Token = token,
             });
         }
 
-        public Task<T> GetAllAsync<T>(string token)
+        public async Task<T> GetAllAsync<T>()
         {
-            return SendAsync<T>(new APIRequest
+            return await _baseService.SendAsync<T>(new APIRequest
             {
                 ApiType = SD.ApiType.GET,
                 Url = houseUrl + "/api/HouseAPI",
-                Token = token,
             });
         }
 
-        public Task<T> GetAsync<T>(int id, string token)
+        public async Task<T> GetAsync<T>(int id)
         {
-            return SendAsync<T>(new APIRequest
+            return await _baseService.SendAsync<T>(new APIRequest
             {
                 ApiType = SD.ApiType.GET,
                 Url = houseUrl + "/api/HouseAPI/" + id,
-                Token = token,
             });
         }
 
-        public Task<T> UpdateAsync<T>(HouseUpdateDTO dto, string token)
+        public async Task<T> UpdateAsync<T>(HouseUpdateDTO dto)
         {
-            return SendAsync<T>(new APIRequest
+            return await _baseService.SendAsync<T>(new APIRequest
             {
                 ApiType = SD.ApiType.PUT,
                 Data = dto,
                 Url = houseUrl + "/api/HouseAPI",
-                Token = token,
+                ContentType = SD.ContentType.MultipartFormData
             });
         }
     }

@@ -24,7 +24,7 @@ namespace HolidayHouse_Web.Controllers
         {
             List<HouseDTO> list = new();
 
-            var response = await _houseService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+            var response = await _houseService.GetAllAsync<APIResponse>();
             if (response != null && response.IsSuccess != false)
             {
                 list = JsonConvert.DeserializeObject<List<HouseDTO>>(Convert.ToString(response.Result));

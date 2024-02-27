@@ -6,65 +6,62 @@ using Newtonsoft.Json.Linq;
 
 namespace HolidayHouse_Web.Services
 {
-    public class HouseNumberService : BaseService, IHouseNumberService
+    public class HouseNumberService : IHouseNumberService
     {
         private readonly IHttpClientFactory _clientFactory;
+        private readonly IBaseService _baseService;
         private string houseUrl;
-        public HouseNumberService(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory)
+        public HouseNumberService(IHttpClientFactory clientFactory, IConfiguration configuration, IBaseService baseService)
         {
             _clientFactory = clientFactory;
+            _baseService = baseService;
             houseUrl = configuration.GetValue<string>("ServiceUrls:HouseAPI");
         }
 
-        public Task<T> CreateAsync<T>(HouseNumberCreateDTO dto, string token)
+        public async Task<T> CreateAsync<T>(HouseNumberCreateDTO dto)
         {
-            return SendAsync<T>(new APIRequest()
+            return await _baseService.SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.POST,
                 Data = dto,
                 Url = houseUrl + "/api/HouseNumberAPI",
-                Token = token,
             });
         }
 
-        public Task<T> DeleteAsync<T>(int id, string token)
+        public async Task<T> DeleteAsync<T>(int id)
         {
-            return SendAsync<T>(new APIRequest
+            return await _baseService.SendAsync<T>(new APIRequest
             {
                 ApiType = SD.ApiType.DELETE,
                 Url = houseUrl + "/api/HouseNumberAPI/" + id,
-                Token = token,
             });
         }
 
-        public Task<T> GetAllAsync<T>(string token)
+        public async Task<T> GetAllAsync<T>()
         {
-            return SendAsync<T>(new APIRequest
+            return await _baseService.SendAsync<T>(new APIRequest
             {
                 ApiType = SD.ApiType.GET,
                 Url = houseUrl + "/api/HouseNumberAPI",
-                Token = token,
             });
         }
 
-        public Task<T> GetAsync<T>(int id, string token)
+        public async Task<T> GetAsync<T>(int id)
         {
-            return SendAsync<T>(new APIRequest
+            return await _baseService.SendAsync<T>(new APIRequest
             {
                 ApiType = SD.ApiType.GET,
                 Url = houseUrl + "/api/HouseNumberAPI/" + id,
-                Token = token,
             });
         }
 
-        public Task<T> UpdateAsync<T>(HouseNumberUpdateDTO dto, string token)
+        public async Task<T> UpdateAsync<T>(HouseNumberUpdateDTO dto)
         {
-            return SendAsync<T>(new APIRequest
+            return await _baseService.SendAsync<T>(new APIRequest
             {
                 ApiType = SD.ApiType.PUT,
                 Data = dto,
                 Url = houseUrl + "/api/HouseNumberAPI",
-                Token = token,
             });
         }
     }

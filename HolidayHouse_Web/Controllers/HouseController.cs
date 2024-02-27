@@ -24,7 +24,7 @@ namespace HolidayHouse_Web.Controllers
         {
             List<HouseDTO> list = new();
 
-            var response = await _houseService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+            var response = await _houseService.GetAllAsync<APIResponse>();
             if (response != null && response.IsSuccess != false) 
             {
                 list = JsonConvert.DeserializeObject<List<HouseDTO>>(Convert.ToString(response.Result));
@@ -46,7 +46,7 @@ namespace HolidayHouse_Web.Controllers
 		{
             if (ModelState.IsValid)
             {
-                var response = await _houseService.CreateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
+                var response = await _houseService.CreateAsync<APIResponse>(model);
                 if (response != null && response.IsSuccess)
                 {
 					TempData["success"] = "Villa created successfully";
@@ -59,7 +59,7 @@ namespace HolidayHouse_Web.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateHouse(int houseId)
 		{
-            var response = await _houseService.GetAsync<APIResponse>(houseId, HttpContext.Session.GetString(SD.SessionToken));
+            var response = await _houseService.GetAsync<APIResponse>(houseId);
             if (response != null && response.IsSuccess != false)
             {
                 HouseDTO model = JsonConvert.DeserializeObject<HouseDTO>(Convert.ToString(response.Result));
@@ -75,7 +75,7 @@ namespace HolidayHouse_Web.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var response = await _houseService.UpdateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
+				var response = await _houseService.UpdateAsync<APIResponse>(model);
 				if (response != null && response.IsSuccess)
 				{
                     TempData["success"] = "Villa updated successfully";
@@ -84,11 +84,11 @@ namespace HolidayHouse_Web.Controllers
 			}
             TempData["error"] = "Error encountered";
             return View(model);
-		}
+		    }
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteHouse(int houseId)
 		{
-			var response = await _houseService.GetAsync<APIResponse>(houseId, HttpContext.Session.GetString(SD.SessionToken));
+			var response = await _houseService.GetAsync<APIResponse>(houseId);
 			if (response != null && response.IsSuccess != false)
 			{
 				HouseDTO model = JsonConvert.DeserializeObject<HouseDTO>(Convert.ToString(response.Result));
@@ -102,7 +102,7 @@ namespace HolidayHouse_Web.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteHouse(HouseDTO model)
 		{
-			var response = await _houseService.DeleteAsync<APIResponse>(model.Id, HttpContext.Session.GetString(SD.SessionToken));
+			var response = await _houseService.DeleteAsync<APIResponse>(model.Id);
 			if (response != null && response.IsSuccess)
 			{
                 TempData["success"] = "Villa deleted successfully";

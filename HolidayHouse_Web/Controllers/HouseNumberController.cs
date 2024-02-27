@@ -29,7 +29,7 @@ namespace HolidayHouse_Web.Controllers
 		{
 			List<HouseNumberDTO> list = new();
 
-			var response = await _houseNumberService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+			var response = await _houseNumberService.GetAllAsync<APIResponse>();
 			if (response != null && response.IsSuccess)
 			{
 				list = JsonConvert.DeserializeObject<List<HouseNumberDTO>>(Convert.ToString(response.Result));
@@ -41,7 +41,7 @@ namespace HolidayHouse_Web.Controllers
 		{
 			HouseNumberCreateVM model = new();
 
-			var responseHouse = await _houseService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+			var responseHouse = await _houseService.GetAllAsync<APIResponse>();
 			if (responseHouse != null && responseHouse.IsSuccess)
 			{
 				model.HouseList = JsonConvert.DeserializeObject<List<HouseDTO>>(Convert.ToString(responseHouse.Result))
@@ -60,7 +60,7 @@ namespace HolidayHouse_Web.Controllers
 		{ 
 			if (ModelState.IsValid)
 			{
-				var response = await _houseNumberService.CreateAsync<APIResponse>(model.HouseNumber, HttpContext.Session.GetString(SD.SessionToken));
+				var response = await _houseNumberService.CreateAsync<APIResponse>(model.HouseNumber);
 				if (response != null && response.IsSuccess)
 				{
 					return RedirectToAction(nameof(IndexHouseNumber));
@@ -73,7 +73,7 @@ namespace HolidayHouse_Web.Controllers
 					}
 				}
 			}
-			var responseHouse = await _houseService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+			var responseHouse = await _houseService.GetAllAsync<APIResponse>();
 			if (responseHouse != null && responseHouse.IsSuccess)
 			{
 				model.HouseList = JsonConvert.DeserializeObject<List<HouseDTO>>(Convert.ToString(responseHouse.Result))
@@ -89,13 +89,13 @@ namespace HolidayHouse_Web.Controllers
         public async Task<IActionResult> UpdateHouseNumber(int houseNo)
 		{
 			HouseNumberUpdateVM model = new();
-			var houseNumberResponse = await _houseNumberService.GetAsync<APIResponse>(houseNo, HttpContext.Session.GetString(SD.SessionToken));
+			var houseNumberResponse = await _houseNumberService.GetAsync<APIResponse>(houseNo);
 			if (houseNumberResponse != null && houseNumberResponse.IsSuccess)
 			{
 				model.HouseNumber = JsonConvert.DeserializeObject<HouseNumberUpdateDTO>(Convert.ToString(houseNumberResponse.Result));
 			}
 
-			var houseResponse = await _houseService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+			var houseResponse = await _houseService.GetAllAsync<APIResponse>();
 			if (houseResponse != null && houseResponse.IsSuccess)
 			{
 				model.HouseList = JsonConvert.DeserializeObject<List<HouseDTO>>(Convert.ToString(houseResponse.Result))
@@ -114,7 +114,7 @@ namespace HolidayHouse_Web.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var response = await _houseNumberService.UpdateAsync<APIResponse>(model.HouseNumber, HttpContext.Session.GetString(SD.SessionToken));
+				var response = await _houseNumberService.UpdateAsync<APIResponse>(model.HouseNumber);
 				if (response != null && response.IsSuccess)
 				{
 					return RedirectToAction(nameof(IndexHouseNumber));
@@ -128,7 +128,7 @@ namespace HolidayHouse_Web.Controllers
 				}
 			}
 
-			var resp = await _houseService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+			var resp = await _houseService.GetAllAsync<APIResponse>();
 			if (resp != null && resp.IsSuccess)
 			{
 				model.HouseList = JsonConvert.DeserializeObject<List<HouseDTO>>(Convert.ToString(resp.Result))
@@ -145,13 +145,13 @@ namespace HolidayHouse_Web.Controllers
         public async Task<IActionResult> DeleteHouseNumber(int houseNo)
 		{
 			HouseNumberDeleteVM model = new();
-			var houseNumberResponse = await _houseNumberService.GetAsync<APIResponse>(houseNo, HttpContext.Session.GetString(SD.SessionToken));
+			var houseNumberResponse = await _houseNumberService.GetAsync<APIResponse>(houseNo);
 			if (houseNumberResponse != null && houseNumberResponse.IsSuccess)
 			{
 				model.HouseNumber = JsonConvert.DeserializeObject<HouseNumberDTO>(Convert.ToString(houseNumberResponse.Result));
 			}
 
-			var houseResponse = await _houseService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+			var houseResponse = await _houseService.GetAllAsync<APIResponse>();
 			if (houseResponse != null && houseResponse.IsSuccess)
 			{
 				model.HouseList = JsonConvert.DeserializeObject<List<HouseDTO>>(Convert.ToString(houseResponse.Result))
@@ -171,7 +171,7 @@ namespace HolidayHouse_Web.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var response = await _houseNumberService.DeleteAsync<APIResponse>(model.HouseNumber.HouseNo, HttpContext.Session.GetString(SD.SessionToken));
+				var response = await _houseNumberService.DeleteAsync<APIResponse>(model.HouseNumber.HouseNo);
 				if (response != null && response.IsSuccess)
 				{
 					return RedirectToAction(nameof(IndexHouseNumber));

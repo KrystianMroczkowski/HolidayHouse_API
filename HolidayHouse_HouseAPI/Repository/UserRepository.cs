@@ -97,6 +97,31 @@ namespace HolidayHouse_HouseAPI.Repository
             return new UserDTO();
         }
 
+		private async Task<string> GetAccessToken(ApplicationUser user, string jwtTokenId)
+		{
+			var roles = await _userManager.GetRolesAsync(user);
+
+			var tokenHandler = new JwtSecurityTokenHandler();
+			var key = Encoding.ASCII.GetBytes(secretKey);
+
+			var tokenDescriptor = new SecurityTokenDescriptor
+			{
+				Subject = new ClaimsIdentity(new Claim[]
+				{
+					new Claim(ClaimTypes.Name, user.UserName.ToString()),
+					new Claim(ClaimTypes.Role, roles.FirstOrDefault()),
+					new Claim(JwtRegisteredClaimNames.Jti, jwtTokenId),
+					new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+				}),
+				Expires = DateTime.UtcNow.AddMinutes(60),
+				SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+			};
+
+			var token = tokenHandler.CreateToken(tokenDescriptor);
+			var tokenStr = tokenHandler.WriteToken(token);
+			return tokenStr;
+		}
+
 		public async Task<TokenDTO> RefreshAccessToken(TokenDTO tokenDTO)
 		{
             var existingRefreshToken = await _db.RefreshTokens.FirstOrDefaultAsync(u => u.Refresh_Token == tokenDTO.RefreshToken);
@@ -105,31 +130,27 @@ namespace HolidayHouse_HouseAPI.Repository
                 return new TokenDTO();
             }
 
-            var accessTokenData = GetAccessTokenData(tokenDTO.AccessToken);
-            if (!accessTokenData.isSuccessful || accessTokenData.userId != existingRefreshToken.UserId ||
-                accessTokenData.TokenId != existingRefreshToken.JwtTokenId)
+            var isTokenValid = GetAccessTokenData(tokenDTO.AccessToken, existingRefreshToken.UserId, existingRefreshToken.JwtTokenId);
+            if (!isTokenValid)
             {
-                existingRefreshToken.IsValid = false;
-                _db.SaveChanges();
+                await MarkTokenAsInvalid(existingRefreshToken);
                 return new TokenDTO();
             }
 
             if (!existingRefreshToken.IsValid)
             {
-				var chainRecords = await _db.RefreshTokens.Where(u => u.UserId == existingRefreshToken.UserId && u.JwtTokenId == existingRefreshToken.JwtTokenId).ExecuteUpdateAsync(u => u.SetProperty(refreshToken => refreshToken.IsValid, false));
-				return new TokenDTO();
+                await MarkAllTokenInChainAsInvalid(existingRefreshToken.UserId, existingRefreshToken.JwtTokenId);
 			}
 
 			if (existingRefreshToken.ExpiresAt < DateTime.UtcNow)
             {
-				existingRefreshToken.IsValid = false;
-				_db.SaveChanges();
+                await MarkTokenAsInvalid(existingRefreshToken);
 				return new TokenDTO();
 			}
 
             var newRefreshToken = await CreateNewRefreshToken(existingRefreshToken.UserId, existingRefreshToken.JwtTokenId);
-			existingRefreshToken.IsValid = false;
-			_db.SaveChanges();
+
+            await MarkTokenAsInvalid(existingRefreshToken);
 
             var applicationUser = _db.ApplicationUsers.FirstOrDefault(u => u.Id == existingRefreshToken.UserId);
             if (applicationUser == null)
@@ -146,14 +167,32 @@ namespace HolidayHouse_HouseAPI.Repository
             };
 		}
 
-        private async Task<string> CreateNewRefreshToken(string userId, string tokenId)
+		public async Task RevokeRefreshToken(TokenDTO tokenDTO)
+		{
+			var existingRefreshToken = await _db.RefreshTokens.FirstOrDefaultAsync(u => u.Refresh_Token == tokenDTO.RefreshToken);
+
+            if (existingRefreshToken == null)
+            {
+                return;
+            }
+
+			var isTokenValid = GetAccessTokenData(tokenDTO.AccessToken, existingRefreshToken.UserId, existingRefreshToken.JwtTokenId);
+			if (!isTokenValid)
+			{
+                return;
+			}
+
+            await MarkAllTokenInChainAsInvalid(existingRefreshToken.UserId, existingRefreshToken.JwtTokenId);
+		}
+
+		private async Task<string> CreateNewRefreshToken(string userId, string tokenId)
         {
             RefreshToken refreshToken = new()
             {
                 IsValid = true,
                 UserId = userId,
                 JwtTokenId = tokenId,
-                ExpiresAt = DateTime.UtcNow.AddDays(30),
+                ExpiresAt = DateTime.UtcNow.AddDays(60),
                 Refresh_Token = Guid.NewGuid() + "-" + Guid.NewGuid(),
             };
 
@@ -162,7 +201,7 @@ namespace HolidayHouse_HouseAPI.Repository
             return refreshToken.Refresh_Token;
         }
 
-        private (bool isSuccessful, string userId, string TokenId) GetAccessTokenData(string accessToken)
+        private bool GetAccessTokenData(string accessToken, string expectedUserId, string expectedTokenId)
         {
             try
             {
@@ -170,38 +209,24 @@ namespace HolidayHouse_HouseAPI.Repository
                 var jwt = tokenHandler.ReadJwtToken(accessToken);
                 var jwtTokenId = jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Jti).Value;
                 var userId = jwt.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Sub).Value;
-                return (true, userId, jwtTokenId);
+                return userId == expectedUserId && jwtTokenId == expectedTokenId;
             }
             catch
             {
-                return (false, null, null);
+                return false;
             }
         }
 
-		private async Task<string> GetAccessToken(ApplicationUser user, string jwtTokenId)
+        private async Task MarkAllTokenInChainAsInvalid(string userId, string tokenId)
         {
-			var roles = await _userManager.GetRolesAsync(user);
+			await _db.RefreshTokens.Where(u => u.UserId == userId && u.JwtTokenId == tokenId)
+                .ExecuteUpdateAsync(u => u.SetProperty(refreshToken => refreshToken.IsValid, false));
+	    }
 
-			var tokenHandler = new JwtSecurityTokenHandler();
-			var key = Encoding.ASCII.GetBytes(secretKey);
-
-			var tokenDescriptor = new SecurityTokenDescriptor
-			{
-				Subject = new ClaimsIdentity(new Claim[]
-				{
-					new Claim(ClaimTypes.Name, user.UserName.ToString()),
-					new Claim(ClaimTypes.Role, roles.FirstOrDefault()),
-                    new Claim(JwtRegisteredClaimNames.Jti, jwtTokenId),
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-				}),
-				Expires = DateTime.UtcNow.AddMinutes(60),
-				SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-			};
-
-			var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenStr = tokenHandler.WriteToken(token);
-            return tokenStr;
+        private Task MarkTokenAsInvalid(RefreshToken refreshToken)
+        {
+			refreshToken.IsValid = false;
+			return _db.SaveChangesAsync();
 		}
-
-    }
+	}
 }

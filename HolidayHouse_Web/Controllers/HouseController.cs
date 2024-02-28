@@ -49,7 +49,7 @@ namespace HolidayHouse_Web.Controllers
                 var response = await _houseService.CreateAsync<APIResponse>(model);
                 if (response != null && response.IsSuccess)
                 {
-					TempData["success"] = "Villa created successfully";
+					TempData["success"] = "House created successfully";
                     return RedirectToAction(nameof(IndexHouse));
                 }
             }
@@ -78,7 +78,7 @@ namespace HolidayHouse_Web.Controllers
 				var response = await _houseService.UpdateAsync<APIResponse>(model);
 				if (response != null && response.IsSuccess)
 				{
-                    TempData["success"] = "Villa updated successfully";
+                    TempData["success"] = "House updated successfully";
                     return RedirectToAction(nameof(IndexHouse));
 				}
 			}
@@ -105,7 +105,7 @@ namespace HolidayHouse_Web.Controllers
 			var response = await _houseService.DeleteAsync<APIResponse>(model.Id);
 			if (response != null && response.IsSuccess)
 			{
-                TempData["success"] = "Villa deleted successfully";
+                TempData["success"] = "House deleted successfully";
                 return RedirectToAction(nameof(IndexHouse));
 			}
             TempData["error"] = "Error encountered";

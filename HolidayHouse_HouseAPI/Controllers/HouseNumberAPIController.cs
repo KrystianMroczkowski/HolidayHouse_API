@@ -100,13 +100,13 @@ namespace HolidayHouse_HouseAPI.Controllers
 
                 if (await _dbHouseNumber.GetAsync(u => u.HouseNo == createDTO.HouseNo, tracked:false) != null)
                 {
-                    ModelState.AddModelError("ErrorMessages", $"Villa Number already Exists!");
+                    ModelState.AddModelError("ErrorMessages", $"House Number already Exists!");
                     return BadRequest(ModelState);
                 }
 
                 if (await _dbHouse.GetAsync(u => u.Id == createDTO.HouseID, tracked:false) == null)
                 {
-                    ModelState.AddModelError("ErrorMessages", $"Villa with {createDTO.HouseID} id doesn't exit!");
+                    ModelState.AddModelError("ErrorMessages", $"House with {createDTO.HouseID} id doesn't exit!");
                     return BadRequest(ModelState);
                 }
 
@@ -179,7 +179,7 @@ namespace HolidayHouse_HouseAPI.Controllers
 
                 if (await _dbHouse.GetAsync(u => u.Id == updateDTO.HouseID) == null)
                 {
-                    ModelState.AddModelError("ErrorMessages", $"Villa with {updateDTO.HouseID} id doesn't exit!");
+                    ModelState.AddModelError("ErrorMessages", $"House with {updateDTO.HouseID} id doesn't exit!");
                     return BadRequest(ModelState);
                 }
 

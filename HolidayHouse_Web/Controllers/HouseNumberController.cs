@@ -63,14 +63,13 @@ namespace HolidayHouse_Web.Controllers
 				var response = await _houseNumberService.CreateAsync<APIResponse>(model.HouseNumber);
 				if (response != null && response.IsSuccess)
 				{
+					TempData["success"] = "House Number created successfully";
 					return RedirectToAction(nameof(IndexHouseNumber));
 				}
 				else
 				{
-					if (response.ErrorMessages.Count > 0)
-					{
-						ModelState.AddModelError("ErrorMessages", response.ErrorMessages.FirstOrDefault());
-					}
+					TempData["error"] = (response.ErrorMessages != null && response.ErrorMessages.Count > 0) ?
+						response.ErrorMessages[0] : "Error Encountered";
 				}
 			}
 			var responseHouse = await _houseService.GetAllAsync<APIResponse>();
@@ -88,23 +87,30 @@ namespace HolidayHouse_Web.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateHouseNumber(int houseNo)
 		{
-			HouseNumberUpdateVM model = new();
-			var houseNumberResponse = await _houseNumberService.GetAsync<APIResponse>(houseNo);
-			if (houseNumberResponse != null && houseNumberResponse.IsSuccess)
+			HouseNumberUpdateVM houseNumberVM = new();
+			var response = await _houseNumberService.GetAsync<APIResponse>(houseNo);
+			if (response != null && response.IsSuccess)
 			{
-				model.HouseNumber = JsonConvert.DeserializeObject<HouseNumberUpdateDTO>(Convert.ToString(houseNumberResponse.Result));
+				HouseNumberDTO model = JsonConvert.DeserializeObject<HouseNumberDTO>(Convert.ToString(response.Result));
+				houseNumberVM.HouseNumber = _mapper.Map<HouseNumberUpdateDTO>(model);
 			}
 
-			var houseResponse = await _houseService.GetAllAsync<APIResponse>();
-			if (houseResponse != null && houseResponse.IsSuccess)
+			response = await _houseService.GetAllAsync<APIResponse>();
+			if (response != null && response.IsSuccess)
 			{
-				model.HouseList = JsonConvert.DeserializeObject<List<HouseDTO>>(Convert.ToString(houseResponse.Result))
+				houseNumberVM.HouseList = JsonConvert.DeserializeObject<List<HouseDTO>>(Convert.ToString(response.Result))
 					.Select(u => new SelectListItem {
 						Text = u.Name,
 						Value = u.Id.ToString()
 					});
+				return View(houseNumberVM);
 			}
-			return View(model);	
+			else
+			{
+				TempData["error"] = (response.ErrorMessages != null && response.ErrorMessages.Count > 0) ?
+					response.ErrorMessages[0] : "Error Encountered";
+			}
+			return NotFound();
 		}
 
 		[HttpPost]
@@ -117,14 +123,13 @@ namespace HolidayHouse_Web.Controllers
 				var response = await _houseNumberService.UpdateAsync<APIResponse>(model.HouseNumber);
 				if (response != null && response.IsSuccess)
 				{
+					TempData["success"] = "House Number updated successfully";
 					return RedirectToAction(nameof(IndexHouseNumber));
 				}
 				else
 				{
-					if (response.ErrorMessages.Count > 0) 
-					{ 
-						ModelState.AddModelError("ErrorMessages", response.ErrorMessages.FirstOrDefault());	
-					}
+					TempData["error"] = (response.ErrorMessages != null && response.ErrorMessages.Count > 0) ?
+						response.ErrorMessages[0] : "Error Encountered";
 				}
 			}
 
@@ -169,16 +174,18 @@ namespace HolidayHouse_Web.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteHouseNumber(HouseNumberDeleteVM model)
 		{
-			if (ModelState.IsValid)
+			var response = await _houseNumberService.DeleteAsync<APIResponse>(model.HouseNumber.HouseNo);
+			if (response != null && response.IsSuccess)
 			{
-				var response = await _houseNumberService.DeleteAsync<APIResponse>(model.HouseNumber.HouseNo);
-				if (response != null && response.IsSuccess)
-				{
-					return RedirectToAction(nameof(IndexHouseNumber));
-
-				}
+				TempData["success"] = "House Number deleted successfully";
+				return RedirectToAction(nameof(IndexHouseNumber));
 			}
-				return View(model);
+			else
+			{
+				TempData["error"] = (response.ErrorMessages != null && response.ErrorMessages.Count > 0) ?
+					response.ErrorMessages[0] : "Error Encountered";
+			}
+			return View(model);
 		}
 	}
 }

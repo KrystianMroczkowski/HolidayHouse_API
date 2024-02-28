@@ -288,39 +288,5 @@ namespace HolidayHouse_HouseAPI.Controllers
             }
             return _response;
         }
-
-        [HttpPatch("{id:int}", Name="UpdatePartialVilla")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<APIResponse>> UpdatePartialHouse(int id, JsonPatchDocument<HouseUpdateDTO> patchDTO)
-        {
-            if (patchDTO == null || id == 0)
-            {
-                return BadRequest();
-            }
-
-            var house = await _dbHouse.GetAsync(u => u.Id == id, tracked: false);
-            if (house == null)
-            {
-                return BadRequest();
-            }
-
-            HouseUpdateDTO houseDTO = _mapper.Map<HouseUpdateDTO>(house);
-
-            patchDTO.ApplyTo(houseDTO, ModelState);
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
-            House houseToUpdate = _mapper.Map<House>(houseDTO);
-
-            await _dbHouse.UpdateAsync(houseToUpdate);
-
-            _response.StatusCode = HttpStatusCode.NoContent;
-            _response.IsSuccess = true;
-
-            return Ok(_response);
-        }
     }
 }

@@ -48,7 +48,6 @@ namespace HolidayHouse_Web.Controllers
                 var principal = new ClaimsPrincipal(identity);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-
                 _tokenProvider.SetToken(model);
                 return RedirectToAction("Index", "Home");
             }
@@ -99,6 +98,8 @@ namespace HolidayHouse_Web.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync();
+            var token = _tokenProvider.GetToken();
+            await _authService.LogoutAsync<APIResponse>(token);
 			_tokenProvider.ClearToken();
 			return RedirectToAction("Index", "Home");  
         }

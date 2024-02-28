@@ -20,7 +20,19 @@ namespace HolidayHouse_HouseAPI.Controllers
             this._response = new();
         }
 
-        [HttpPost("login")]
+        [HttpGet("Error")]
+        public async Task<IActionResult> Error()
+        {
+            throw new FileNotFoundException();
+        }
+
+		[HttpGet("ImageError")]
+		public async Task<IActionResult> ImageError()
+		{
+			throw new BadImageFormatException("Fake Image Exception");
+		}
+
+		[HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO model)
         {
             var tokenDto = await _userRepo.Login(model);
@@ -87,6 +99,21 @@ namespace HolidayHouse_HouseAPI.Controllers
                 _response.ErrorMessages.Add("Invalid Input");
                 return BadRequest(_response);
             }
+		}
+
+		[HttpPost("revoke")]
+		public async Task<IActionResult> RevokeRefreshToken([FromBody] TokenDTO tokenDTO)
+		{
+			if (ModelState.IsValid)
+			{
+				await _userRepo.RevokeRefreshToken(tokenDTO); 
+                _response.StatusCode = HttpStatusCode.OK;
+                return Ok(_response);
+			}
+
+			_response.IsSuccess = false;
+			_response.ErrorMessages.Add("Invalid Input");
+			return BadRequest(_response);
 		}
 	}
 }

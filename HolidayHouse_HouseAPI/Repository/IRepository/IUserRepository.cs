@@ -9,5 +9,6 @@ namespace HolidayHouse_HouseAPI.Repository.IRepository
         Task<TokenDTO> Login(LoginRequestDTO loginRequestDTO);
         Task<UserDTO> Register(RegistrationRequestDTO registrationRequestDTO);
 		Task<TokenDTO> RefreshAccessToken(TokenDTO tokenDTO);
+        Task RevokeRefreshToken(TokenDTO tokenDTO);
 	}
 }
